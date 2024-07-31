@@ -49,8 +49,18 @@ public class GenerationDictionary<T>
 
     public void Clear()
     {
-        _generation++;
         _count = 0;
+        if (_generation < int.MaxValue)
+        {
+            _generation++;
+            return;
+        }
+        
+        _generation = 1;
+        for (var i = 0; i < _items.Length; i++)
+        {
+            _items[i].Generation = 0;
+        }
     }
 
     public bool ContainsKey(int key)
@@ -81,9 +91,11 @@ public class GenerationDictionary<T>
     public void Remove(int key)
     {
         if (key < 0 || key >= _items.Length) return;
+
         var item = _items[key];
         if (item.Generation != _generation) return;
-        _items[key].Generation = _generation - 1;
+
+        _items[key].Generation = 0;
         _count--;
     }
 }
